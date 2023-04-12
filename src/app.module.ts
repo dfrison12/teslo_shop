@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ProductsModule } from './products/products.module';
+import { CommonModule } from './common/common.module';
 
 @Module({
   imports: [
@@ -12,9 +14,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       database: process.env.DB_NAME,
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
-      autoLoadEntities: true,
+      autoLoadEntities: true, //config para que cargue automaticamente las entidades que vamos definiendo poco a poco
       synchronize: true, //Cuando creamos algun cambio en nuestras entidades (por ejemplo: borrar o agregar una columna) automaticamente las sincroniza. En produccion usualmente se hacen prosesos mediante migraciones y no se usa esta opcion. Un metodo seria crear un archivo cuando se detecte algun tipo de cambio.
     }),
+    ProductsModule,
+    CommonModule,
   ],
 })
 export class AppModule {}
