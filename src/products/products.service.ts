@@ -152,6 +152,8 @@ export class ProductsService {
     const product = await this.findOne(id);
     await this.productRepository.remove(product);
 
+    // Para borrar un producto, que tiene imagenes relacionadas podriamos usar una transaccion para luego borrar las imegenes y luego el producto, en caso de que falle el borrado de imagenes se hace un rollback. - Pero usaremos delete en cascada por ahora.
+
     return `${product.title} deleted`;
   }
 
@@ -163,5 +165,15 @@ export class ProductsService {
     throw new InternalServerErrorException(
       'Unexpected error, check server logs',
     );
+  }
+
+  async deleteAllProducts() {
+    const query = this.productRepository.createQueryBuilder('product');
+
+    try {
+      return await query.delete().where({}).execute();
+    } catch (error) {
+      this.handleDBExeptions(error);
+    }
   }
 }
