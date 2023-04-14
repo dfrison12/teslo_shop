@@ -3,8 +3,10 @@ import {
   BeforeUpdate,
   Column,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { ProductImage } from './';
 
 //Nota: recordar que la entitie es una representacion del objeto en la base de datos, en este caso representaria una tabla.
 @Entity()
@@ -36,7 +38,17 @@ export class Product {
   gender: string;
 
   //tags
-  //images
+  @Column('text', {
+    array: true,
+    default: [],
+  })
+  tags: string[];
+
+  @OneToMany(() => ProductImage, (productImage) => productImage.product, {
+    cascade: true,
+    eager: true, //necesario, de la doc de typeorm para cargar las ralciones usando algun metodo find*
+  })
+  images?: ProductImage[];
 
   //Validaciones
 
@@ -52,5 +64,15 @@ export class Product {
       .replaceAll("'", '');
   }
 
-  //@BeforeUpdate()
+  @BeforeUpdate()
+  checkSlugUpdate() {
+    if (!this.slug) {
+      this.slug = this.title;
+    }
+
+    this.slug = this.slug
+      .toLowerCase()
+      .replaceAll(' ', '_')
+      .replaceAll("'", '');
+  }
 }
